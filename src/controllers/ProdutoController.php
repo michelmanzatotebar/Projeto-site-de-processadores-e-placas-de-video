@@ -1,3 +1,4 @@
+?<?php
 class ProdutoController {
     private $produtoModel;
 
