@@ -1,3 +1,4 @@
+?<?php
 class ClienteController {
     private $clienteModel;
 
@@ -6,12 +7,11 @@ class ClienteController {
     }
 
     public function formLogin() {
-        // Mostra formulário de login
+    
         require_once 'Views/cliente/login.php';
     }
 
     public function login() {
-        // Processa o login
         $email = $_POST['email'] ?? '';
         $senha = $_POST['senha'] ?? '';
 
@@ -25,12 +25,11 @@ class ClienteController {
     }
 
     public function formCadastro() {
-        // Mostra formulário de cadastro
-        require_once 'Views/cliente/cadastro.php';
+         require_once 'Views/cliente/cadastro.php';
     }
 
     public function cadastrar() {
-        // Processa o cadastro
+  
         $dados = [
             'nome' => $_POST['nome'],
             'email' => $_POST['email'],

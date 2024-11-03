@@ -1,3 +1,4 @@
+?<?php
 require_once '../src/Rotas/Roteador.php';
 require_once '../src/Controllers/ProdutoController.php';
 require_once '../src/Controllers/CarrinhoController.php';
@@ -6,7 +7,6 @@ require_once '../src/Controllers/PedidoController.php';
 
 $roteador = new Roteador();
 
-// Rotas de Produtos
 $roteador->obter('/', function() {
     $controlador = new ProdutoController();
     $controlador->index();
@@ -17,7 +17,7 @@ $roteador->obter('/produto/:id', function($id) {
     $controlador->mostrar($id);
 });
 
-// Rotas do Carrinho
+
 $roteador->obter('/carrinho', function() {
     $controlador = new CarrinhoController();
     $controlador->mostrar();
@@ -33,7 +33,6 @@ $roteador->enviar('/carrinho/remover', function() {
     $controlador->remover();
 });
 
-// Rotas do Cliente
 $roteador->obter('/cliente/login', function() {
     $controlador = new ClienteController();
     $controlador->formLogin();
@@ -49,7 +48,6 @@ $roteador->obter('/cliente/cadastro', function() {
     $controlador->formCadastro();
 });
 
-// Rotas de Pedido
 $roteador->obter('/pedido/finalizar', function() {
     $controlador = new PedidoController();
     $controlador->finalizar();

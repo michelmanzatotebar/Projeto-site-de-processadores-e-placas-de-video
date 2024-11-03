@@ -3,7 +3,7 @@
         'name' => 'michel/projeto-web-de-michel-tebar-802-371',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '970654524a1e56ce7305d9a92bd3485be1c39a35',
+        'reference' => '7f3bafaf89189ee544fcf24314c7dbdc636398f5',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'michel/projeto-web-de-michel-tebar-802-371' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '970654524a1e56ce7305d9a92bd3485be1c39a35',
+            'reference' => '7f3bafaf89189ee544fcf24314c7dbdc636398f5',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
