@@ -1,35 +1,57 @@
 <?php
+
 class Carrinho {
-    private $id;
-    private $email_cliente;
-    private $id_produto;
-    private $quantidade;
-    private $preco_produto;
-    private $preco_total;
+    private $conn;
     
-    public function __construct($id, $email_cliente, $id_produto, $quantidade, $preco_produto) {
-        $this->id = $id;
-        $this->email_cliente = $email_cliente;
-        $this->id_produto = $id_produto;
-        $this->quantidade = $quantidade;
-        $this->preco_produto = $preco_produto;
-        $this->calcularPrecoTotal();
+    public function __construct($db) {
+        $this->conn = new Carrinho ($db);
     }
     
-    private function calcularPrecoTotal() {
-        $this->preco_total = $this->quantidade * $this->preco_produto;
+    public function create($email_cliente, $id_produto, $quantidade, $preco_produto) {
+        $preco_total = $quantidade * $preco_produto;
+        $sql = "INSERT INTO Carrinho (Email_cliente, Id_produto, Quantidade, Preco_produto, Preco_total) 
+                VALUES (:email_cliente, :id_produto, :quantidade, :preco_produto, :preco_total)";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':email_cliente', $email_cliente);
+        $stmt->bindParam(':id_produto', $id_produto);
+        $stmt->bindParam(':quantidade', $quantidade);
+        $stmt->bindParam(':preco_produto', $preco_produto);
+        $stmt->bindParam(':preco_total', $preco_total);
+        return $stmt->execute();
     }
     
- 
-    public function getId() { return $this->id; }
-    public function getEmailCliente() { return $this->email_cliente; }
-    public function getIdProduto() { return $this->id_produto; }
-    public function getQuantidade() { return $this->quantidade; }
-    public function getPrecoProtudo() { return $this->preco_produto; }
-    public function getPrecoTotal() { return $this->preco_total; }
+    public function list() {
+        $sql = "SELECT * FROM Carrinho";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
     
-    public function setQuantidade($quantidade) {
-        $this->quantidade = $quantidade;
-        $this->calcularPrecoTotal();
+    public function getById($id) {
+        $sql = "SELECT * FROM Carrinho WHERE ID = :id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    
+    public function update($id, $quantidade) {
+        $sql = "UPDATE Carrinho 
+                SET Quantidade = :quantidade, 
+                    Preco_total = Quantidade * Preco_produto 
+                WHERE ID = :id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':quantidade', $quantidade);
+        $stmt->execute();
+        return $stmt->rowCount();
+    }
+    
+    public function delete($id) {
+        $sql = "DELETE FROM Carrinho WHERE ID = :id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->rowCount();
     }
 }

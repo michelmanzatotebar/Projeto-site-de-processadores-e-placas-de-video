@@ -2,56 +2,68 @@
 class CarrinhoController {
     private $carrinhoModel;
     private $produtoModel;
-
-    public function __construct() {
-        $this->carrinhoModel = new Carrinho();
-        $this->produtoModel = new Produto();
+    
+    public function __construct($db) {
+        $this->carrinhoModel = new Carrinho($db);
+        $this->produtoModel = new Produto($db);
     }
-
+    
     public function mostrar() {
-        $email_cliente = $_SESSION['cliente_email'] ?? null;
-        if(!$email_cliente) {
-            header('Location: /cliente/login');
-            return;
+        try {
+            $email_cliente = $_SESSION['cliente_email'] ?? null;
+            if (!$email_cliente) {
+                header('Location: /cliente/login');
+                return;
+            }
+            
+            $itens = $this->carrinhoModel->listByCliente($email_cliente);
+            require_once 'Views/carrinho/mostrar.php';
+        } catch(PDOException $e) {
+            $erro = "Erro ao mostrar carrinho: " . $e->getMessage();
+            require_once 'Views/erro.php';
         }
-
-        $itens = $this->carrinhoModel->buscarItens($email_cliente);
-        require_once 'Views/carrinho/mostrar.php';
     }
-
+    
     public function adicionar() {
-        $email_cliente = $_SESSION['cliente_email'] ?? null;
-        if(!$email_cliente) {
-            header('Location: /cliente/login');
-            return;
-        }
-
-        $produto_id = $_POST['id_produto'];
-        $quantidade = $_POST['quantidade'];
-        $preco = $this->produtoModel->buscarPreco($produto_id);
-
-        $dados = [
-            'email_cliente' => $email_cliente,
-            'id_produto' => $produto_id,
-            'quantidade' => $quantidade,
-            'preco_produto' => $preco,
-            'preco_total' => $preco * $quantidade
-        ];
-
-        if($this->carrinhoModel->adicionar($dados)) {
-            header('Location: /carrinho');
-        } else {
-            $erro = "Erro ao adicionar ao carrinho";
-            header('Location: /produto/' . $produto_id);
+        try {
+            $email_cliente = $_SESSION['cliente_email'] ?? null;
+            if (!$email_cliente) {
+                header('Location: /cliente/login');
+                return;
+            }
+            
+            $produto_id = filter_input(INPUT_POST, 'id_produto', FILTER_SANITIZE_NUMBER_INT);
+            $quantidade = filter_input(INPUT_POST, 'quantidade', FILTER_SANITIZE_NUMBER_INT);
+            
+            $produto = $this->produtoModel->getById($produto_id);
+            if (!$produto) {
+                header('Location: /produtos');
+                return;
+            }
+            
+            if ($this->carrinhoModel->create($email_cliente, $produto_id, $quantidade, $produto['Preco'])) {
+                header('Location: /carrinho');
+                exit;
+            } else {
+                $erro = "Erro ao adicionar ao carrinho";
+                header('Location: /produto/' . $produto_id);
+            }
+        } catch(PDOException $e) {
+            $erro = "Erro ao adicionar ao carrinho: " . $e->getMessage();
+            require_once 'Views/erro.php';
         }
     }
-
+    
     public function remover() {
-        $email_cliente = $_SESSION['cliente_email'] ?? null;
-        $produto_id = $_POST['id_produto'];
-
-        if($this->carrinhoModel->remover($email_cliente, $produto_id)) {
-            header('Location: /carrinho');
+        try {
+            $id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT);
+            if ($this->carrinhoModel->delete($id)) {
+                header('Location: /carrinho');
+                exit;
+            }
+        } catch(PDOException $e) {
+            $erro = "Erro ao remover item do carrinho: " . $e->getMessage();
+            require_once 'Views/erro.php';
         }
     }
 }

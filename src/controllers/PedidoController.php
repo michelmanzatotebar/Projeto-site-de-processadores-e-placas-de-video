@@ -2,53 +2,58 @@
 class PedidoController {
     private $pedidoModel;
     private $carrinhoModel;
-
-    public function __construct() {
-        $this->pedidoModel = new Pedido();
-        $this->carrinhoModel = new Carrinho();
-    }
-
-    public function finalizar() {
     
-        $email_cliente = $_SESSION['cliente_email'] ?? null;
-        if(!$email_cliente) {
-            header('Location: /cliente/login');
-            return;
-        }
-
-        $itens = $this->carrinhoModel->buscarItens($email_cliente);
-        require_once 'Views/pedido/finalizar.php';
+    public function __construct($db) {
+        $this->pedidoModel = new Pedido($db);
+        $this->carrinhoModel = new Carrinho($db);
     }
-
-    public function confirmar() {
-        
-        $email_cliente = $_SESSION['cliente_email'] ?? null;
-        if(!$email_cliente) {
-            header('Location: /cliente/login');
-            return;
-        }
-
-        
-        $itens = $this->carrinhoModel->buscarItens($email_cliente);
-        
-
-        $total = 0;
-        foreach($itens as $item) {
-            $total += $item['preco_total'];
-        }
-
-        $dados = [
-            'email_cliente' => $email_cliente,
-            'quantidade' => count($itens),
-            'preco_total' => $total
-        ];
-
-        if($this->pedidoModel->criar($dados)) {
-          $this->carrinhoModel->limpar($email_cliente);
-            require_once 'Views/pedido/sucesso.php';
-        } else {
-            $erro = "Erro ao finalizar pedido";
+    
+    public function finalizar() {
+        try {
+            $email_cliente = $_SESSION['cliente_email'] ?? null;
+            if (!$email_cliente) {
+                header('Location: /cliente/login');
+                return;
+            }
+            
+            $itens = $this->carrinhoModel->listByCliente($email_cliente);
             require_once 'Views/pedido/finalizar.php';
+        } catch(PDOException $e) {
+            $erro = "Erro ao finalizar pedido: " . $e->getMessage();
+            require_once 'Views/erro.php';
+        }
+    }
+    
+    public function confirmar() {
+        try {
+            $email_cliente = $_SESSION['cliente_email'] ?? null;
+            if (!$email_cliente) {
+                header('Location: /cliente/login');
+                return;
+            }
+            
+            $itens = $this->carrinhoModel->listByCliente($email_cliente);
+            if (empty($itens)) {
+                header('Location: /carrinho');
+                return;
+            }
+            
+            $total = array_reduce($itens, function($acc, $item) {
+                return $acc + $item['Preco_total'];
+            }, 0);
+            
+            if ($this->pedidoModel->create($email_cliente, count($itens), $total)) {
+                foreach ($itens as $item) {
+                    $this->carrinhoModel->delete($item['ID']);
+                }
+                require_once 'Views/pedido/sucesso.php';
+            } else {
+                $erro = "Erro ao finalizar pedido";
+                require_once 'Views/pedido/finalizar.php';
+            }
+        } catch(PDOException $e) {
+            $erro = "Erro ao confirmar pedido: " . $e->getMessage();
+            require_once 'Views/erro.php';
         }
     }
 }
