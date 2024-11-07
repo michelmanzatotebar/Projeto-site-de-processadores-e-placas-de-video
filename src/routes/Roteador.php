@@ -1,29 +1,25 @@
-?<?php
-class Roteador {
-    private $rotas = [];
-    
-    public function obter($caminho, $funcao) {
-        $this->rotas['GET'][$caminho] = $funcao;
+<?php
+
+class Router
+{
+    private $routes = [];
+
+    public function add($method, $path, $callback)
+    {
+        $path = preg_replace('/{(\w+)}/', '(\d+)', $path);
+        $this->routes[] = ['method' => $method, 'path' => "#^" . $path . "$#", 'callback' => $callback];
     }
-    
-    public function enviar($caminho, $funcao) {
-        $this->rotas['POST'][$caminho] = $funcao;
-    }
-    
-    public function executar() {
-        $metodo = $_SERVER['REQUEST_METHOD'];
-        $caminho = $_SERVER['PATH_INFO'] ?? '/';
-        
-        $funcao = $this->rotas[$metodo][$caminho] ?? false;
-        
-        if(!$funcao) {
-            header("HTTP/1.0 404 Not Found");
-            require_once '../src/Views/404.php';
-            return;
+
+    public function dispatch($requestedPath)
+    {
+        $requestedMethod = $_SERVER["REQUEST_METHOD"];
+
+        foreach ($this->routes as $route) {
+            if ($route['method'] === $requestedMethod && preg_match($route['path'], $requestedPath, $matches)) {
+                array_shift($matches);
+                return call_user_func($route['callback'], $matches[0]);
+            }
         }
-        
-        if(is_callable($funcao)) {
-            call_user_func($funcao);
-        }
+        echo "404 - Página não encontrada";
     }
 }
