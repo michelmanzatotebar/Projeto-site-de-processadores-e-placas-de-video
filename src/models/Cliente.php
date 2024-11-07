@@ -1,33 +1,57 @@
 <?php
 class Cliente {
-    private $id;
-    private $nome;
-    private $endereco;
-    private $numero;
-    private $email;
+    private $conn;
     
-    public function __construct($id, $nome, $endereco, $numero, $email) {
-        $this->id = $id;
-        $this->nome = $nome;
-        $this->endereco = $endereco;
-        $this->numero = $numero;
-        $this->email = $email;
+    public function __construct($db) {
+        $this->conn = new Cliente($db);
     }
     
-  
-    public function getId() { return $this->id; }
-    public function getNome() { return $this->nome; }
-    public function getEndereco() { return $this->endereco; }
-    public function getNumero() { return $this->numero; }
-    public function getEmail() { return $this->email; }
+    public function create($nome, $endereco, $numero, $email) {
+        $sql = "INSERT INTO Cliente (Nome, Endereco, Numero, Email) 
+                VALUES (:nome, :endereco, :numero, :email)";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':nome', $nome);
+        $stmt->bindParam(':endereco', $endereco);
+        $stmt->bindParam(':numero', $numero);
+        $stmt->bindParam(':email', $email);
+        return $stmt->execute();
+    }
     
-    public function toArray() {
-        return [
-            'id' => $this->id,
-            'nome' => $this->nome,
-            'endereco' => $this->endereco,
-            'numero' => $this->numero,
-            'email' => $this->email
-        ];
+    public function list() {
+        $sql = "SELECT * FROM Cliente";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    public function getById($id) {
+        $sql = "SELECT * FROM Cliente WHERE ID = :id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    
+    public function update($id, $nome, $endereco, $numero, $email) {
+        $sql = "UPDATE Cliente 
+                SET Nome = :nome, Endereco = :endereco, 
+                    Numero = :numero, Email = :email 
+                WHERE ID = :id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':nome', $nome);
+        $stmt->bindParam(':endereco', $endereco);
+        $stmt->bindParam(':numero', $numero);
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
+        return $stmt->rowCount();
+    }
+    
+    public function delete($id) {
+        $sql = "DELETE FROM Cliente WHERE ID = :id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->rowCount();
     }
 }
