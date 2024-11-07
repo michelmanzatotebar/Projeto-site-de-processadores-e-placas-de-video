@@ -9,7 +9,6 @@ class CarrinhoController {
     }
 
     public function mostrar() {
-        // Mostra itens do carrinho
         $email_cliente = $_SESSION['cliente_email'] ?? null;
         if(!$email_cliente) {
             header('Location: /cliente/login');
@@ -21,7 +20,6 @@ class CarrinhoController {
     }
 
     public function adicionar() {
-        // Adiciona produto ao carrinho
         $email_cliente = $_SESSION['cliente_email'] ?? null;
         if(!$email_cliente) {
             header('Location: /cliente/login');
@@ -49,7 +47,6 @@ class CarrinhoController {
     }
 
     public function remover() {
-        // Remove item do carrinho
         $email_cliente = $_SESSION['cliente_email'] ?? null;
         $produto_id = $_POST['id_produto'];
 
