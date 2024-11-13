@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Loja de Hardware</title>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="#" class="logo">Loja de Hardware</a>
+            </nav>
+            <div class="user-actions">
+                <div class="cart-icon">
+                    🛒
+                    <span class="cart-count">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="filters">
+            <div class="filter-grid">
+                <div class="filter-item">
+                    <select id="categoryFilter">
+                        <option value="all">Todas as Categorias</option>
+                        <option value="Processador">Processadores</option>
+                        <option value="Placa de Vídeo">Placas de Vídeo</option>
+                    </select>
+                </div>
+            
+                <div class="filter-item">
+                    <select id="brandFilter">
+                        <option value="all">Todas as Marcas</option>
+                        <option value="AMD">AMD</option>
+                        <option value="INTEL">Intel</option>
+                        <option value="NVIDIA">NVIDIA</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section class="products-grid">
+
+            <div class="product-card">
+                <img src="AMD Ryzen 9 7950X.jpg" alt="Processador AMD" class="product-image" >
+                <div class="product-info">
+                    <div class="product-category">Processador</div>
+                    <div class="product-brand">AMD</div>
+                    <h3 class="product-title">Ryzen 9 7950X</h3>
+                    <p class="product-specs">16 cores, 32 threads, Até 5.7GHz</p>
+                    <div class="product-price">R$ 4.999,90</div>
+                    <button class="add-to-cart">Adicionar ao Carrinho</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <img src="I913900K.png" alt="Processador Intel" class="product-image">
+                <div class="product-info">
+                    <div class="product-category">Processador</div>
+                    <div class="product-brand">INTEL</div>
+                    <h3 class="product-title">Core i9-13900K</h3>
+                    <p class="product-specs">24 cores (8P+16E), 32 threads, Até 5.8GHz</p>
+                    <div class="product-price">R$ 4.599,90</div>
+                    <button class="add-to-cart">Adicionar ao Carrinho</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <img src="Ryzen7-7700X.png" class="product-image">
+                <div class="product-info">
+                    <div class="product-category">Processador</div>
+                    <div class="product-brand">AMD</div>
+                    <h3 class="product-title">Ryzen 7 7700X</h3>
+                    <div class="product-specs">8 cores, 16 threads, Até 5.4GHz</div>
+                    <div class="product-price">R$ 2.999,90</div>
+                    <button class="add-to-cart">Adicionar ao Carrinho</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <img src="Ryzen5-7600X.png" class="product-image">
+                <div class="product-info">
+                    <div class="product-category">Processador</div>
+                    <div class="product-brand">AMD</div>
+                    <h3 class="product-title">Ryzen 5 7600X</h3>
+                    <div class="product-specs">6 cores, 12 threads, Até 5.3GHz</div>
+                    <div class="product-price">R$ 1.899,90</div>
+                    <button class="add-to-cart">Adicionar ao Carrinho</button>
+                </div>
+            </div>
+            
+            <div class="product-card">
+                <img src="i7-13700K.jpg" class="product-image">
+                <div class="product-info">
+                    <div class="product-category">Processador</div>
+                    <div class="product-brand">INTEL</div>
+                    <h3 class="product-title">Core i7-13700K</h3>
+                    <div class="product-specs">16 cores (8P+8E), 24 threads, Até 5.4GHz</div>
+                    <div class="product-price">R$ 3.299,90</div>
+                    <button class="add-to-cart">Adicionar ao Carrinho</button>
+                </div>
+            </div>
+            
+            <div class="product-card">
+                <img src="i5-13600K.jpg" class="product-image">
+                <div class="product-info">
+                    <div class="product-category">Processador</div>
+                    <div class="product-brand">INTEL</div>
+                    <h3 class="product-title">Core i5-13600K</h3>
+                    <div class="product-specs">14 cores (6P+8E), 20 threads, Até 5.1GHz</div>
+                    <div class="product-price">R$ 2.399,90</div>
+                    <button class="add-to-cart">Adicionar ao Carrinho</button>
+                </div>
+            </div>
+            
+            <div class="product-card">
+                <img src="rtx 4080.png" class="product-image">
+                <div class="product-info">
+                    <div class="product-category">Placa de Vídeo</div>
+                    <div class="product-brand">NVIDIA</div>
+                    <h3 class="product-title">RTX 4080</h3>
+                    <div class="product-specs">16GB GDDR6X</div>
+                    <div class="product-price">R$ 8.999,90</div>
+                    <button class="add-to-cart">Adicionar ao Carrinho</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <img src="rtx 4090.png" alt="Placa de Vídeo NVIDIA" class="product-image">
+                <div class="product-info">
+                    <div class="product-category">Placa de Vídeo</div>
+                    <div class="product-brand">NVIDIA</div>
+                    <h3 class="product-title">RTX 4090</h3>
+                    <p class="product-specs">24GB GDDR6X</p>
+                    <div class="product-price">R$ 12.999,90</div>
+                    <button class="add-to-cart">Adicionar ao Carrinho</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <img src="RX 7900 XTX.jpg" alt="Placa de Vídeo AMD" class="product-image">
+                <div class="product-info">
+                    <div class="product-category">Placa de Vídeo</div>
+                    <div class="product-brand">AMD</div>
+                    <h3 class="product-title">RX 7900 XTX</h3>
+                    <p class="product-specs">24GB GDDR6</p>
+                    <div class="product-price">R$ 8.999,90</div>
+                    <button class="add-to-cart">Adicionar ao Carrinho</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <img src="rx 7800xt.png" class="product-image">
+                <div class="product-info">
+                    <div class="product-category">Placa de Vídeo</div>
+                    <div class="product-brand">AMD</div>
+                    <h3 class="product-title">RX 7800 XT</h3>
+                    <div class="product-specs">16GB GDDR6</div>
+                    <div class="product-price">R$ 4.999,90</div>
+                    <button class="add-to-cart">Adicionar ao Carrinho</button>
+                </div>
+            </div>
+
+        </section>
+    </main>
+    <div id="cartSidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h3>Carrinho de Compras</h3>
+            <button onclick="closeCart()" class="close-cart">×</button>
+        </div>
+        <div id="cartItems" class="cart-items">
+
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cartTotal">R$ 0,00</span>
+            </div>
+            <button onclick="proceedToCheckout()" class="checkout-button">
+                Continuar para o pagamento
+            </button>
+        </div>
+    </div>
+    <script src="filters.js"></script>
+    <script src="cart.js"></script>
+</body>
+</html>
