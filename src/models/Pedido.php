@@ -1,9 +1,9 @@
 <?php
-class Pedido {
+class Pedido { 
     private $conn;
     
     public function __construct($db) {
-        $this->conn = New Pedido ($db);
+        $this->conn = $db;
     }
     
     public function create($email_cliente, $quantidade, $preco_total) {
