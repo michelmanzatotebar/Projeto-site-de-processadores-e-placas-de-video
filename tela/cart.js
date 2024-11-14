@@ -104,8 +104,17 @@ function updateQuantity(productId, newQuantity) {
 
 
 function proceedToCheckout() {
+    if (cart.items.length === 0) {
+        alert('Seu carrinho está vazio!');
+        return;
+    }
     
-    window.location.href = '/checkout';
+    localStorage.setItem('cartData', JSON.stringify({
+        items: cart.items,
+        total: cart.total
+    }));
+    
+    window.location.href = 'tela2.html';
 }
 
 
