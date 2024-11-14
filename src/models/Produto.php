@@ -3,7 +3,7 @@ class Produto {
     private $conn;
     
     public function __construct($db) {
-        $this->conn = new Produto($db);
+        $this->conn = $db;
     }
     
     public function create($nome, $categoria, $marca, $especificacoes, $preco) {

@@ -4,7 +4,7 @@ class Carrinho {
     private $conn;
     
     public function __construct($db) {
-        $this->conn = new Carrinho ($db);
+        $this->conn = $db;
     }
     
     public function create($email_cliente, $id_produto, $quantidade, $preco_produto) {
@@ -20,29 +20,32 @@ class Carrinho {
         return $stmt->execute();
     }
     
-    public function list() {
-        $sql = "SELECT * FROM Carrinho";
+    public function listByCliente($email_cliente) {
+        $sql = "SELECT c.*, p.Nome as Produto_Nome 
+                FROM Carrinho c 
+                JOIN Produto p ON c.Id_produto = p.ID 
+                WHERE c.Email_cliente = :email_cliente";
         $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':email_cliente', $email_cliente);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
-    public function getById($id) {
-        $sql = "SELECT * FROM Carrinho WHERE ID = :id";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindParam(':id', $id);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-    
     public function update($id, $quantidade) {
+        $item = $this->getById($id);
+        if (!$item) {
+            return false;
+        }
+        
+        $preco_total = $quantidade * $item['Preco_produto'];
         $sql = "UPDATE Carrinho 
                 SET Quantidade = :quantidade, 
-                    Preco_total = Quantidade * Preco_produto 
+                    Preco_total = :preco_total 
                 WHERE ID = :id";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':quantidade', $quantidade);
+        $stmt->bindParam(':preco_total', $preco_total);
         $stmt->execute();
         return $stmt->rowCount();
     }

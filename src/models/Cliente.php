@@ -3,39 +3,36 @@ class Cliente {
     private $conn;
     
     public function __construct($db) {
-        $this->conn = new Cliente($db);
+        $this->conn = $db;
     }
     
-    public function create($nome, $endereco, $numero, $email) {
-        $sql = "INSERT INTO Cliente (Nome, Endereco, Numero, Email) 
-                VALUES (:nome, :endereco, :numero, :email)";
+    public function create($nome, $endereco, $numero, $email, $senha) {
+        $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
+        $sql = "INSERT INTO Cliente (Nome, Endereco, Numero, Email, Senha) 
+                VALUES (:nome, :endereco, :numero, :email, :senha)";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':nome', $nome);
         $stmt->bindParam(':endereco', $endereco);
         $stmt->bindParam(':numero', $numero);
         $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':senha', $senha_hash);
         return $stmt->execute();
     }
     
-    public function list() {
-        $sql = "SELECT * FROM Cliente";
+    public function getByEmail($email) {
+        $sql = "SELECT * FROM Cliente WHERE Email = :email";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    
-    public function getById($id) {
-        $sql = "SELECT * FROM Cliente WHERE ID = :id";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':email', $email);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
     public function update($id, $nome, $endereco, $numero, $email) {
         $sql = "UPDATE Cliente 
-                SET Nome = :nome, Endereco = :endereco, 
-                    Numero = :numero, Email = :email 
+                SET Nome = :nome, 
+                    Endereco = :endereco, 
+                    Numero = :numero, 
+                    Email = :email 
                 WHERE ID = :id";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':id', $id);
