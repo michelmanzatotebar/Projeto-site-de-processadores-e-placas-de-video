@@ -1,3 +1,5 @@
+const API_BASE_URL = '/Projeto-site-de-processadores-e-placas-de-video/public';
+
 function getCartData() {
     const cartData = localStorage.getItem('cartData');
     return cartData ? JSON.parse(cartData) : null;
@@ -23,7 +25,7 @@ function renderOrderItems(items) {
     document.getElementById('checkout-total').textContent = `R$ ${total.toFixed(2)}`;
 }
 
-function handleCheckoutSubmit(event) {
+async function handleCheckoutSubmit(event) {
     event.preventDefault();
     
     const cartData = getCartData();
@@ -38,26 +40,47 @@ function handleCheckoutSubmit(event) {
         return;
     }
 
-    
-    const quantidade = cartData.items.reduce((total, item) => total + item.quantity, 0);
-    
-    
-    const precoTotal = cartData.total;
+    try {
+        const quantidade = cartData.items.reduce((total, item) => total + item.quantity, 0);
+        const precoTotal = cartData.items.reduce((total, item) => total + (item.price * item.quantity), 0);
 
-    const pedidoData = {
-        email_cliente: email,
-        quantidade: quantidade,
-        preco_total: precoTotal
-    };
+        const pedidoData = {
+            email_cliente: email,
+            quantidade: quantidade,
+            preco_total: precoTotal
+        };
 
-   
-    console.log('Dados do pedido:', pedidoData);
-    
-  
-    localStorage.removeItem('cartData');
-    
-    alert('Pedido realizado com sucesso!');
-    window.location.href = 'tela.html';
+        console.log('Enviando pedido:', pedidoData);
+
+        const response = await fetch(`${API_BASE_URL}/Pedido`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(pedidoData),
+            mode: 'cors'
+        });
+
+        console.log('Status da resposta:', response.status);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Erro da API:', errorText);
+            throw new Error(`Erro ao criar pedido: ${response.status}`);
+        }
+
+        const responseData = await response.json();
+        console.log('Resposta do servidor:', responseData);
+
+        localStorage.removeItem('cartData');
+        alert('Pedido realizado com sucesso!');
+        window.location.href = 'tela.html';
+        
+    } catch (error) {
+        console.error('Erro ao finalizar pedido:', error);
+        alert('Erro ao finalizar pedido. Por favor, tente novamente.');
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -70,5 +93,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
     renderOrderItems(cartData.items);
     
-    document.getElementById('checkout-form').addEventListener('submit', handleCheckoutSubmit);
+    const checkoutForm = document.getElementById('checkout-form');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', handleCheckoutSubmit);
+    }
+
+    const backButton = document.querySelector('.back-button');
+    if (backButton) {
+        backButton.addEventListener('click', () => {
+            window.location.href = 'tela.html';
+        });
+    }
 });
