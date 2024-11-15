@@ -16,7 +16,6 @@
     <main class="main-content checkout-content">
         <div class="checkout-container">
             <h1>Finalizar Compra</h1>
-            
             <div class="order-summary">
                 <h2>Resumo do Pedido</h2>
                 <div id="checkout-items" class="checkout-items">
@@ -33,36 +32,14 @@
                     <label for="email">E-mail:</label>
                     <input type="email" id="email" name="email" required>
                 </div>
-
-                <div class="form-group">
-                    <label for="name">Nome completo:</label>
-                    <input type="text" id="name" name="name" required>
+            
+                <div class="checkout-total">
+                    Total: <span id="checkout-total">R$ 0,00</span>
                 </div>
-
-                <div class="payment-methods">
-                    <h3>Forma de Pagamento</h3>
-                    <div class="payment-options">
-                        <label class="payment-option">
-                            <input type="radio" name="payment" value="pix" checked>
-                            <span>PIX</span>
-                        </label>
-                        <label class="payment-option">
-                            <input type="radio" name="payment" value="credit">
-                            <span>Cartão de Crédito</span>
-                        </label>
-                        <label class="payment-option">
-                            <input type="radio" name="payment" value="boleto">
-                            <span>Boleto</span>
-                        </label>
-                    </div>
-                </div>
+            
                 <div class="checkout-buttons">
-                    <button type="button" onclick="window.location.href='tela.html'" class="back-button">
-                        Voltar
-                    </button>
-                    <button type="submit" class="confirm-order-button">
-                        Confirmar Pedido
-                    </button>
+                    <a href="tela.html" class="back-button">Voltar</a>
+                    <button type="submit" class="confirm-order-button">Confirmar Pedido</button>
                 </div>
             </form>
         </div>

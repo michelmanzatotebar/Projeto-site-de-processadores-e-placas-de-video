@@ -1,4 +1,3 @@
-
 function getCartData() {
     const cartData = localStorage.getItem('cartData');
     return cartData ? JSON.parse(cartData) : null;
@@ -24,21 +23,40 @@ function renderOrderItems(items) {
     document.getElementById('checkout-total').textContent = `R$ ${total.toFixed(2)}`;
 }
 
-
 function handleCheckoutSubmit(event) {
     event.preventDefault();
     
+    const cartData = getCartData();
+    if (!cartData || !cartData.items || cartData.items.length === 0) {
+        alert('Carrinho vazio!');
+        return;
+    }
+
     const email = document.getElementById('email').value;
-    const name = document.getElementById('name').value;
-    const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+    if (!email) {
+        alert('Por favor, insira seu email');
+        return;
+    }
+
     
+    const quantidade = cartData.items.reduce((total, item) => total + item.quantity, 0);
+    
+    
+    const precoTotal = cartData.total;
+
+    const pedidoData = {
+        email_cliente: email,
+        quantidade: quantidade,
+        preco_total: precoTotal
+    };
+
    
-    alert(`Pedido confirmado!\nEmail: ${email}\nNome: ${name}\nPagamento: ${paymentMethod}`);
+    console.log('Dados do pedido:', pedidoData);
     
-    
+  
     localStorage.removeItem('cartData');
     
-    
+    alert('Pedido realizado com sucesso!');
     window.location.href = 'tela.html';
 }
 
