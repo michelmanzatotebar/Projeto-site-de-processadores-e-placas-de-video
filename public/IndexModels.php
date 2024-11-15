@@ -9,16 +9,16 @@ require_once __DIR__ . '/../src/controllers/ClienteController.php';
 require_once __DIR__ . '/../src/controllers/PedidoController.php';
 require_once __DIR__ . '/../src/controllers/ProdutoController.php';
 
+header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
+header("Access-Control-Allow-Headers: Content-Type");
+
 $router = new Router();
 $carrinhoController = new CarrinhoController($pdo);
 $clienteController = new ClienteController($pdo);
 $pedidoController = new PedidoController($pdo);
 $produtoController = new ProdutoController($pdo);
-
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
-header("Access-Control-Allow-Headers: Content-Type");
 
 $router->add('GET', '/Carrinho', [$carrinhoController, 'list']);
 $router->add('GET', '/Carrinho/{id}', [$carrinhoController, 'getById']);
