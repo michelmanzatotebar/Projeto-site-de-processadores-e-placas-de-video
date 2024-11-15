@@ -1,5 +1,5 @@
 <?php
-class Pedido { 
+class Pedido {
     private $conn;
     
     public function __construct($db) {
@@ -7,13 +7,35 @@ class Pedido {
     }
     
     public function create($email_cliente, $quantidade, $preco_total) {
-        $sql = "INSERT INTO Pedido (Email_cliente, Quantidade, Preco_total) 
-                VALUES (:email_cliente, :quantidade, :preco_total)";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindParam(':email_cliente', $email_cliente);
-        $stmt->bindParam(':quantidade', $quantidade);
-        $stmt->bindParam(':preco_total', $preco_total);
-        return $stmt->execute();
+        try {
+            $stmt = $this->conn->prepare("SELECT Email FROM Cliente WHERE Email = :email");
+            $stmt->bindParam(':email', $email_cliente);
+            $stmt->execute();
+            
+            if ($stmt->rowCount() === 0) {
+                $stmtInsert = $this->conn->prepare("INSERT INTO Cliente (Email, Nome) VALUES (:email, :email)");
+                $stmtInsert->bindParam(':email', $email_cliente);
+                $stmtInsert->execute();
+            }
+            
+            $sql = "INSERT INTO Pedido (Email_cliente, Quantidade, Preco_total) 
+                    VALUES (:email_cliente, :quantidade, :preco_total)";
+            
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':email_cliente', $email_cliente);
+            $stmt->bindParam(':quantidade', $quantidade);
+            $stmt->bindParam(':preco_total', $preco_total);
+            
+            if ($stmt->execute()) {
+                return $this->conn->lastInsertId();
+            }
+            
+            return false;
+            
+        } catch (PDOException $e) {
+            error_log("Erro ao criar pedido: " . $e->getMessage());
+            throw $e;
+        }
     }
     
     public function list() {
@@ -33,21 +55,20 @@ class Pedido {
     
     public function update($id, $quantidade, $preco_total) {
         $sql = "UPDATE Pedido 
-                SET Quantidade = :quantidade, Preco_total = :preco_total 
+                SET Quantidade = :quantidade, 
+                    Preco_total = :preco_total 
                 WHERE ID = :id";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':quantidade', $quantidade);
         $stmt->bindParam(':preco_total', $preco_total);
-        $stmt->execute();
-        return $stmt->rowCount();
+        return $stmt->execute();
     }
     
     public function delete($id) {
         $sql = "DELETE FROM Pedido WHERE ID = :id";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':id', $id);
-        $stmt->execute();
-        return $stmt->rowCount();
+        return $stmt->execute();
     }
 }

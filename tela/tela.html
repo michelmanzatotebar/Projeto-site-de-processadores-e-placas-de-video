@@ -10,11 +10,13 @@
     <header>
         <div class="header-content">
             <a href="#" class="logo">Loja de Hardware</a>
-            </nav>
+            
             <div class="user-actions">
+                <button class="my-orders-btn" onclick="window.location.href='meus-pedidos.html'">
+                    📋 Meus Pedidos
+                </button>
                 <div class="cart-icon">
-                    🛒
-                    <span class="cart-count">0</span>
+                    🛒 <span class="cart-count">0</span>
                 </div>
             </div>
         </div>
@@ -44,7 +46,7 @@
 
         <section class="products-grid">
 
-            <div class="product-card">
+            <div class="product-card" data-product-id="1">
                 <img src="AMD Ryzen 9 7950X.jpg" alt="Processador AMD" class="product-image" >
                 <div class="product-info">
                     <div class="product-category">Processador</div>
@@ -56,7 +58,7 @@
                 </div>
             </div>
 
-            <div class="product-card">
+            <div class="product-card" data-product-id="2">
                 <img src="I913900K.png" alt="Processador Intel" class="product-image">
                 <div class="product-info">
                     <div class="product-category">Processador</div>
@@ -68,7 +70,7 @@
                 </div>
             </div>
 
-            <div class="product-card">
+            <div class="product-card" data-product-id="3">
                 <img src="Ryzen7-7700X.png" class="product-image">
                 <div class="product-info">
                     <div class="product-category">Processador</div>
@@ -80,7 +82,7 @@
                 </div>
             </div>
 
-            <div class="product-card">
+            <div class="product-card" data-product-id="4">
                 <img src="Ryzen5-7600X.png" class="product-image">
                 <div class="product-info">
                     <div class="product-category">Processador</div>
@@ -92,7 +94,7 @@
                 </div>
             </div>
             
-            <div class="product-card">
+            <div class="product-card" data-product-id="5">
                 <img src="i7-13700K.jpg" class="product-image">
                 <div class="product-info">
                     <div class="product-category">Processador</div>
@@ -104,7 +106,7 @@
                 </div>
             </div>
             
-            <div class="product-card">
+            <div class="product-card" data-product-id="6">
                 <img src="i5-13600K.jpg" class="product-image">
                 <div class="product-info">
                     <div class="product-category">Processador</div>
@@ -116,7 +118,7 @@
                 </div>
             </div>
             
-            <div class="product-card">
+            <div class="product-card" data-product-id="7">
                 <img src="rtx 4080.png" class="product-image">
                 <div class="product-info">
                     <div class="product-category">Placa de Vídeo</div>
@@ -128,7 +130,7 @@
                 </div>
             </div>
 
-            <div class="product-card">
+            <div class="product-card" data-product-id="8">
                 <img src="rtx 4090.png" alt="Placa de Vídeo NVIDIA" class="product-image">
                 <div class="product-info">
                     <div class="product-category">Placa de Vídeo</div>
@@ -140,7 +142,7 @@
                 </div>
             </div>
 
-            <div class="product-card">
+            <div class="product-card" data-product-id="9">
                 <img src="RX 7900 XTX.jpg" alt="Placa de Vídeo AMD" class="product-image">
                 <div class="product-info">
                     <div class="product-category">Placa de Vídeo</div>
@@ -152,7 +154,7 @@
                 </div>
             </div>
 
-            <div class="product-card">
+            <div class="product-card" data-product-id="10">
                 <img src="rx 7800xt.png" class="product-image">
                 <div class="product-info">
                     <div class="product-category">Placa de Vídeo</div>
@@ -169,19 +171,17 @@
     <div id="cartSidebar" class="cart-sidebar">
         <div class="cart-header">
             <h3>Carrinho de Compras</h3>
-            <button onclick="closeCart()" class="close-cart">×</button>
+            <button class="close-cart">×</button>
         </div>
+        
         <div id="cartItems" class="cart-items">
-
         </div>
+        
         <div class="cart-footer">
             <div class="cart-total">
-                <span>Total:</span>
-                <span id="cartTotal">R$ 0,00</span>
+                Total: <span id="cartTotal">R$ 0,00</span>
             </div>
-            <button onclick="proceedToCheckout()" class="checkout-button">
-                Continuar para o pagamento
-            </button>
+            <button class="checkout-button">Continuar para o pagamento</button>
         </div>
     </div>
     <script src="filters.js"></script>

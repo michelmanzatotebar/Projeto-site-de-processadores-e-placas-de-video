@@ -18,5 +18,4 @@ $pathItems = explode("/", $requestedPath);
 $requestedPath = "/" . (isset($pathItems[2]) ? $pathItems[3] : "") . 
                  (isset($pathItems[4]) && $pathItems[4] ? "/" . $pathItems[4] : "");
 
-echo "     - PATH REQUISITADO NO index: " . $requestedPath; 
 $router->dispatch($requestedPath);
