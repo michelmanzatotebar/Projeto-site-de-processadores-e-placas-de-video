@@ -24,15 +24,12 @@ CREATE TABLE Carrinho (
     Id_produto INT,
     Quantidade DECIMAL(10,2),
     Preco_produto DECIMAL(10,2),
-    Preco_total DECIMAL(10,2),
-    FOREIGN KEY (Email_cliente) REFERENCES Cliente(Email),
-    FOREIGN KEY (Id_produto) REFERENCES Produto(ID)
+    Preco_total DECIMAL(10,2)
 );
 
 CREATE TABLE Pedido (
     ID INT PRIMARY KEY AUTO_INCREMENT,
     Email_cliente VARCHAR(50),
     Quantidade DECIMAL(10,2),
-    Preco_total DECIMAL(10,2),
-    FOREIGN KEY (Email_cliente) REFERENCES Cliente(Email)
+    Preco_total DECIMAL(10,2)
 );

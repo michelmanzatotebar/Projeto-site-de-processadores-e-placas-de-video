@@ -1,4 +1,3 @@
-const API_BASE_URL = '/Projeto-site-de-processadores-e-placas-de-video/public';
 
 let cart = {
     items: [],

@@ -632,18 +632,62 @@ nav a:hover {
 .my-orders-btn:hover {
     background-color: var(--primary-color);
 }
+
+/*email*/
+.email-input-group {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.confirm-email-button {
+    padding: 0.8rem 1rem;
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.confirm-email-button:hover {
+    background-color: var(--primary-color);
+}
+
+.email-status {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.email-status.success {
+    color: #2f855a;
+}
+
+.email-status.error {
+    color: #e53e3e;
+}
+
+.confirm-order-button:disabled {
+    background-color: #a0aec0;
+    cursor: not-allowed;
+}
+
 /*meuspedidos*/
 
-.orders-container {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 1rem;
+.orders-section {
+    padding: 2rem 0;
+}
+
+.orders-section h1 {
+    margin-bottom: 2rem;
+    color: var(--text-color);
 }
 
 .order-card {
     background: white;
     border-radius: 8px;
-    padding: 1rem;
+    padding: 1.5rem;
     margin-bottom: 1rem;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
@@ -653,14 +697,27 @@ nav a:hover {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.order-header h3 {
+    color: var(--primary-color);
+    margin: 0;
 }
 
 .order-date {
     color: #666;
+    font-size: 0.9rem;
 }
 
 .order-details {
     margin-bottom: 1rem;
+}
+
+.order-details p {
+    margin: 0.5rem 0;
+    color: var(--text-color);
 }
 
 .order-actions {
@@ -675,6 +732,7 @@ nav a:hover {
     padding: 0.5rem 1rem;
     border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 .delete-order:hover {
@@ -685,6 +743,9 @@ nav a:hover {
     text-align: center;
     padding: 2rem;
     color: #666;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .my-orders-btn .icon {

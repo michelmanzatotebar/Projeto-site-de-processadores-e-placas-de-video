@@ -1,5 +1,4 @@
 <?php
-
 require_once './src/config/db.php';
 require_once './src/routes/Router.php';
 
@@ -10,7 +9,9 @@ header("Content-type: application/json; charset=UTF-8");
 
 $router = new Router();
 
-require_once './public/indexModels.php';
+require_once './src/public/IndexCarrinho.php';
+require_once './src/public/IndexPedido.php';
+
 
 $requestedPath = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 $pathItems = explode("/", $requestedPath);
@@ -18,4 +19,5 @@ $pathItems = explode("/", $requestedPath);
 $requestedPath = "/" . (isset($pathItems[2]) ? $pathItems[3] : "") . 
                  (isset($pathItems[4]) && $pathItems[4] ? "/" . $pathItems[4] : "");
 
-$router->dispatch($requestedPath);
+//echo "     - PATH REQUISITADO NO index: " . $requestedPath; 
+$router->dispatch($requestedPath); 
