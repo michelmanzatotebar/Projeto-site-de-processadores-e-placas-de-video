@@ -1,11 +1,12 @@
 {
-    "name": "michel/projeto-web-de-michel-tebar-802-371",
+    "name": "michel/projeto-site-de-processadores-e-placas-de-video",
+    "description": "site de venda de processadores e placa de video",
     "require-dev": {
         "phpunit/phpunit": "^11.4"
     },
     "autoload": {
         "psr-4": {
-            "Michel\\ProjetoWebDeMichelTebar802371\\": "src/"
+            "Michel\\ProjetoSiteDeProcessadoresEPlacasDeVideo\\": "src/"
         }
     },
     "authors": [
