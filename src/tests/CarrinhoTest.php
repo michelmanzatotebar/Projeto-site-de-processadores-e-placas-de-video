@@ -4,103 +4,218 @@ use PHPUnit\Framework\TestCase;
 
 class CarrinhoTest extends TestCase
 {
+    private $pdoMock;
     private $carrinho;
-    private $db;
-    private $stmt;
+    private $stmtMock;
 
     protected function setUp(): void
     {
-        $this->db = $this->createMock(PDO::class);
-        $this->stmt = $this->createMock(PDOStatement::class);
-        $this->carrinho = new Carrinho($this->db);
+        $this->pdoMock = $this->createMock(PDO::class);
+        
+        $this->stmtMock = $this->createMock(PDOStatement::class);
+        
+        $this->carrinho = new Carrinho($this->pdoMock);
     }
 
     public function testCreate()
     {
-        $this->db->expects($this->once())
-            ->method('prepare')
-            ->willReturn($this->stmt);
+        $email_cliente = "test@example.com";
+        $id_produto = 1;
+        $quantidade = 2;
+        $preco_produto = 50.00;
+        $preco_total = 100.00;
 
-        $this->stmt->expects($this->once())
+        $this->pdoMock->expects($this->once())
+            ->method('prepare')
+            ->with($this->stringContains("INSERT INTO Carrinho"))
+            ->willReturn($this->stmtMock);
+
+        $this->stmtMock->expects($this->exactly(5))
+            ->method('bindParam')
+            ->willReturn(true);
+
+        $this->stmtMock->expects($this->once())
             ->method('execute')
             ->willReturn(true);
 
-        $resultado = $this->carrinho->create('test@email.com', 1, 2, 100.00);
-        $this->assertTrue($resultado);
+        $result = $this->carrinho->create($email_cliente, $id_produto, $quantidade, $preco_produto);
+        $this->assertTrue($result);
     }
 
-    public function testList()
+    public function testListByCliente()
     {
-        $esperado = [
-            ['ID' => 1, 'Email_cliente' => 'test@email.com', 'Quantidade' => 2],
-            ['ID' => 2, 'Email_cliente' => 'test2@email.com', 'Quantidade' => 1]
+        $email_cliente = "test@example.com";
+        $expectedData = [
+            [
+                'ID' => 1,
+                'Email_cliente' => 'test@example.com',
+                'Id_produto' => 1,
+                'Quantidade' => 2,
+                'Preco_produto' => 50.00,
+                'Preco_total' => 100.00,
+                'Produto_Nome' => 'Produto Test'
+            ]
         ];
 
-        $this->db->expects($this->once())
+        $this->pdoMock->expects($this->once())
             ->method('prepare')
-            ->willReturn($this->stmt);
+            ->with($this->stringContains("SELECT c.*, p.Nome as Produto_Nome"))
+            ->willReturn($this->stmtMock);
 
-        $this->stmt->expects($this->once())
-            ->method('execute');
+        $this->stmtMock->expects($this->once())
+            ->method('bindParam')
+            ->with(':email_cliente', $email_cliente)
+            ->willReturn(true);
 
-        $this->stmt->expects($this->once())
+        $this->stmtMock->expects($this->once())
+            ->method('execute')
+            ->willReturn(true);
+
+        $this->stmtMock->expects($this->once())
             ->method('fetchAll')
-            ->willReturn($esperado);
+            ->with(PDO::FETCH_ASSOC)
+            ->willReturn($expectedData);
 
-        $resultado = $this->carrinho->list();
-        $this->assertEquals($esperado, $resultado);
-    }
-
-    public function testGetById()
-    {
-        $esperado = ['ID' => 1, 'Email_cliente' => 'test@email.com', 'Quantidade' => 2];
-
-        $this->db->expects($this->once())
-            ->method('prepare')
-            ->willReturn($this->stmt);
-
-        $this->stmt->expects($this->once())
-            ->method('execute');
-
-        $this->stmt->expects($this->once())
-            ->method('fetch')
-            ->willReturn($esperado);
-
-        $resultado = $this->carrinho->getById(1);
-        $this->assertEquals($esperado, $resultado);
+        $result = $this->carrinho->listByCliente($email_cliente);
+        $this->assertEquals($expectedData, $result);
     }
 
     public function testUpdate()
     {
-        $this->db->expects($this->once())
+        $id = 1;
+        $nova_quantidade = 3;
+        $item_atual = [
+            'ID' => 1,
+            'Preco_produto' => 50.00,
+            'Quantidade' => 2
+        ];
+
+        $carrinho = $this->getMockBuilder(Carrinho::class)
+            ->setConstructorArgs([$this->pdoMock])
+            ->onlyMethods(['getById'])
+            ->getMock();
+
+        $carrinho->expects($this->once())
+            ->method('getById')
+            ->with($id)
+            ->willReturn($item_atual);
+
+        $this->pdoMock->expects($this->once())
             ->method('prepare')
-            ->willReturn($this->stmt);
+            ->with($this->stringContains("UPDATE Carrinho"))
+            ->willReturn($this->stmtMock);
 
-        $this->stmt->expects($this->once())
-            ->method('execute');
+        $this->stmtMock->expects($this->exactly(3))
+            ->method('bindParam')
+            ->willReturn(true);
 
-        $this->stmt->expects($this->once())
+        $this->stmtMock->expects($this->once())
+            ->method('execute')
+            ->willReturn(true);
+
+        $this->stmtMock->expects($this->once())
             ->method('rowCount')
             ->willReturn(1);
 
-        $resultado = $this->carrinho->update(1, 3);
-        $this->assertEquals(1, $resultado);
+        $result = $carrinho->update($id, $nova_quantidade);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testUpdateWithInvalidId()
+    {
+        $id = 999;
+        $nova_quantidade = 3;
+
+        $carrinho = $this->getMockBuilder(Carrinho::class)
+            ->setConstructorArgs([$this->pdoMock])
+            ->onlyMethods(['getById'])
+            ->getMock();
+
+        $carrinho->expects($this->once())
+            ->method('getById')
+            ->with($id)
+            ->willReturn(false);
+
+        $result = $carrinho->update($id, $nova_quantidade);
+        $this->assertFalse($result);
     }
 
     public function testDelete()
     {
-        $this->db->expects($this->once())
+        $id = 1;
+
+        $this->pdoMock->expects($this->once())
             ->method('prepare')
-            ->willReturn($this->stmt);
+            ->with($this->stringContains("DELETE FROM Carrinho WHERE ID = :id"))
+            ->willReturn($this->stmtMock);
 
-        $this->stmt->expects($this->once())
-            ->method('execute');
+        $this->stmtMock->expects($this->once())
+            ->method('bindParam')
+            ->with(':id', $id)
+            ->willReturn(true);
 
-        $this->stmt->expects($this->once())
+        $this->stmtMock->expects($this->once())
+            ->method('execute')
+            ->willReturn(true);
+
+        $this->stmtMock->expects($this->once())
             ->method('rowCount')
             ->willReturn(1);
 
-        $resultado = $this->carrinho->delete(1);
-        $this->assertEquals(1, $resultado);
+        $result = $this->carrinho->delete($id);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testDeleteNotFound()
+    {
+        $id = 999;
+
+        $this->pdoMock->expects($this->once())
+            ->method('prepare')
+            ->with($this->stringContains("DELETE FROM Carrinho WHERE ID = :id"))
+            ->willReturn($this->stmtMock);
+
+        $this->stmtMock->expects($this->once())
+            ->method('bindParam')
+            ->with(':id', $id)
+            ->willReturn(true);
+
+        $this->stmtMock->expects($this->once())
+            ->method('execute')
+            ->willReturn(true);
+
+        $this->stmtMock->expects($this->once())
+            ->method('rowCount')
+            ->willReturn(0);
+
+        $result = $this->carrinho->delete($id);
+        $this->assertEquals(0, $result);
+    }
+
+    public function testCreateThrowsException()
+    {
+        $email_cliente = "test@example.com";
+        $id_produto = 1;
+        $quantidade = 2;
+        $preco_produto = 50.00;
+
+        $this->pdoMock->expects($this->once())
+            ->method('prepare')
+            ->willThrowException(new PDOException('Database error'));
+
+        $this->expectException(PDOException::class);
+        $this->carrinho->create($email_cliente, $id_produto, $quantidade, $preco_produto);
+    }
+
+    public function testListByClienteThrowsException()
+    {
+        $email_cliente = "test@example.com";
+
+        $this->pdoMock->expects($this->once())
+            ->method('prepare')
+            ->willThrowException(new PDOException('Database error'));
+
+        $this->expectException(PDOException::class);
+        $this->carrinho->listByCliente($email_cliente);
     }
 }

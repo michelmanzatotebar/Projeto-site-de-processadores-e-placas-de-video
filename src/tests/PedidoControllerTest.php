@@ -2,149 +2,295 @@
 
 use PHPUnit\Framework\TestCase;
 
+class PhpInputStreamMock
+{
+    private static $data = '';
+    
+    public function stream_open($path, $mode, $options, &$opened_path)
+    {
+        return true;
+    }
+    
+    public function stream_read($count)
+    {
+        $ret = substr(self::$data, 0, $count);
+        self::$data = substr(self::$data, $count);
+        return $ret;
+    }
+    
+    public function stream_eof()
+    {
+        return empty(self::$data);
+    }
+    
+    public function stream_stat()
+    {
+        return [];
+    }
+    
+    public static function setData($data)
+    {
+        self::$data = $data;
+    }
+}
+
 class PedidoControllerTest extends TestCase
 {
+    private $pedidoModelMock;
+    private $dbMock;
     private $pedidoController;
-    private $pedidoModel;
-    private $carrinhoModel;
-    private $db;
-    
+
     protected function setUp(): void
     {
-        $this->db = $this->createMock(PDO::class);
-        $this->pedidoModel = $this->createMock(Pedido::class);
-        $this->carrinhoModel = $this->createMock(Carrinho::class);
-        $this->pedidoController = new PedidoController($this->db);
+        $this->dbMock = $this->createMock(PDO::class);
+        $this->pedidoModelMock = $this->createMock(Pedido::class);
         
-        if (!isset($_SESSION)) {
-            $_SESSION = [];
+        $this->pedidoController = new PedidoController($this->dbMock);
+        
+        $reflection = new ReflectionClass($this->pedidoController);
+        $property = $reflection->getProperty('pedidoModel');
+        $property->setAccessible(true);
+        $property->setValue($this->pedidoController, $this->pedidoModelMock);
+    }
+
+    protected function tearDown(): void
+    {
+        if (ob_get_length()) {
+            ob_end_clean();
         }
     }
-    
-    public function testFinalizarRedirecionaQuandoNaoLogado()
+
+    public function testCreateSuccess()
     {
-    
-        $_SESSION = [];
-        
-       
-        ob_start();
-        $this->pedidoController->finalizar();
-        $headers = xdebug_get_headers();
-        ob_end_clean();
-        
-        
-        $this->assertContains('Location: /cliente/login', $headers);
-    }
-    
-    public function testFinalizarExibeTelaComItensDoCarrinho()
-    {
-        $_SESSION['cliente_email'] = 'test@example.com';
-        $itensEsperados = [
-            [
-                'ID' => 1,
-                'Produto_ID' => 1,
-                'Quantidade' => 2,
-                'Preco_total' => 100.00
-            ]
+        $testData = [
+            'email_cliente' => 'test@example.com',
+            'quantidade' => 2,
+            'preco_total' => 100.00
         ];
-        
-        $this->carrinhoModel->expects($this->once())
-            ->method('listByCliente')
-            ->with('test@example.com')
-            ->willReturn($itensEsperados);
-            
-      
+
+        stream_wrapper_unregister('php');
+        stream_wrapper_register('php', 'PhpInputStreamMock');
+        PhpInputStreamMock::setData(json_encode($testData));
+
+        $this->pedidoModelMock->expects($this->once())
+            ->method('create')
+            ->with(
+                $testData['email_cliente'],
+                $testData['quantidade'],
+                $testData['preco_total']
+            )
+            ->willReturn(true);
+
         ob_start();
-        $this->pedidoController->finalizar();
+        $this->pedidoController->create();
         $output = ob_get_clean();
-        
-      
-        $this->assertStringContainsString('Views/pedido/finalizar.php', $output);
+
+        stream_wrapper_restore('php');
+
+        $response = json_decode($output, true);
+        $this->assertEquals('Pedido criado com sucesso.', $response['message']);
+        $this->assertEquals(201, http_response_code());
     }
-    
-    public function testConfirmarPedidoComSucesso()
+
+    public function testCreateWithInvalidData()
     {
-        
-        $_SESSION['cliente_email'] = 'test@example.com';
-        $itensCarrinho = [
+        $testData = [
+            'email_cliente' => 'test@example.com'
+      
+        ];
+
+        stream_wrapper_unregister('php');
+        stream_wrapper_register('php', 'PhpInputStreamMock');
+        PhpInputStreamMock::setData(json_encode($testData));
+
+        ob_start();
+        $this->pedidoController->create();
+        $output = ob_get_clean();
+
+        stream_wrapper_restore('php');
+
+        $response = json_decode($output, true);
+        $this->assertEquals('Dados incompletos.', $response['message']);
+        $this->assertEquals(400, http_response_code());
+    }
+
+    public function testCreateWithDatabaseError()
+    {
+        $testData = [
+            'email_cliente' => 'test@example.com',
+            'quantidade' => 2,
+            'preco_total' => 100.00
+        ];
+
+        stream_wrapper_unregister('php');
+        stream_wrapper_register('php', 'PhpInputStreamMock');
+        PhpInputStreamMock::setData(json_encode($testData));
+
+        $this->pedidoModelMock->expects($this->once())
+            ->method('create')
+            ->willThrowException(new PDOException('Database error'));
+
+        ob_start();
+        $this->pedidoController->create();
+        $output = ob_get_clean();
+
+        stream_wrapper_restore('php');
+
+        $response = json_decode($output, true);
+        $this->assertArrayHasKey('error', $response);
+        $this->assertEquals(500, http_response_code());
+    }
+
+    public function testListSuccess()
+    {
+        $expectedPedidos = [
             [
-                'ID' => 1,
-                'Produto_ID' => 1,
-                'Quantidade' => 2,
-                'Preco_total' => 100.00
+                'id' => 1,
+                'email_cliente' => 'test@example.com',
+                'quantidade' => 2,
+                'preco_total' => 100.00
             ],
             [
-                'ID' => 2,
-                'Produto_ID' => 2,
-                'Quantidade' => 1,
-                'Preco_total' => 50.00
+                'id' => 2,
+                'email_cliente' => 'test2@example.com',
+                'quantidade' => 1,
+                'preco_total' => 50.00
             ]
         ];
-        
-        $this->carrinhoModel->expects($this->once())
-            ->method('listByCliente')
-            ->with('test@example.com')
-            ->willReturn($itensCarrinho);
-            
-        $this->pedidoModel->expects($this->once())
-            ->method('create')
-            ->with('test@example.com', 2, 150.00)
-            ->willReturn(true);
-            
-        $this->carrinhoModel->expects($this->exactly(2))
-            ->method('delete')
-            ->willReturn(true);
-            
+
+        $this->pedidoModelMock->expects($this->once())
+            ->method('list')
+            ->willReturn($expectedPedidos);
+
         ob_start();
-        $this->pedidoController->confirmar();
+        $this->pedidoController->list();
         $output = ob_get_clean();
-        
-        $this->assertStringContainsString('Views/pedido/sucesso.php', $output);
+
+        $this->assertEquals($expectedPedidos, json_decode($output, true));
     }
-    
-    public function testConfirmarRedirecionaQuandoCarrinhoVazio()
+
+    public function testListWithError()
     {
-       
-        $_SESSION['cliente_email'] = 'test@example.com';
-        
-        $this->carrinhoModel->expects($this->once())
-            ->method('listByCliente')
-            ->with('test@example.com')
-            ->willReturn([]);
-            
-        
+        $this->pedidoModelMock->expects($this->once())
+            ->method('list')
+            ->willThrowException(new Exception('Erro ao listar pedidos'));
+
         ob_start();
-        $this->pedidoController->confirmar();
-        $headers = xdebug_get_headers();
-        ob_end_clean();
-       
-        $this->assertContains('Location: /carrinho', $headers);
+        $this->pedidoController->list();
+        $output = ob_get_clean();
+
+        $response = json_decode($output, true);
+        $this->assertEquals('Erro ao listar pedidos', $response['error']);
+        $this->assertEquals(500, http_response_code());
     }
-    
-    public function testConfirmarExibeErroQuandoFalha()
+
+    public function testGetByIdSuccess()
     {
-        $_SESSION['cliente_email'] = 'test@example.com';
-        $itensCarrinho = [
-            [
-                'ID' => 1,
-                'Produto_ID' => 1,
-                'Quantidade' => 2,
-                'Preco_total' => 100.00
-            ]
+        $id = 1;
+        $expectedPedido = [
+            'id' => 1,
+            'email_cliente' => 'test@example.com',
+            'quantidade' => 2,
+            'preco_total' => 100.00
         ];
-        
-        $this->carrinhoModel->expects($this->once())
-            ->method('listByCliente')
-            ->willReturn($itensCarrinho);
-            
-        $this->pedidoModel->expects($this->once())
-            ->method('create')
+
+        $this->pedidoModelMock->expects($this->once())
+            ->method('getById')
+            ->with($id)
+            ->willReturn($expectedPedido);
+
+        ob_start();
+        $this->pedidoController->getById($id);
+        $output = ob_get_clean();
+
+        $this->assertEquals($expectedPedido, json_decode($output, true));
+    }
+
+    public function testGetByIdNotFound()
+    {
+        $id = 999;
+
+        $this->pedidoModelMock->expects($this->once())
+            ->method('getById')
+            ->with($id)
             ->willReturn(false);
-   
+
         ob_start();
-        $this->pedidoController->confirmar();
+        $this->pedidoController->getById($id);
         $output = ob_get_clean();
-        
-        $this->assertStringContainsString('Erro ao finalizar pedido', $output);
+
+        $response = json_decode($output, true);
+        $this->assertEquals('Pedido não encontrado', $response['error']);
+        $this->assertEquals(404, http_response_code());
+    }
+
+    public function testGetByIdWithError()
+    {
+        $id = 1;
+
+        $this->pedidoModelMock->expects($this->once())
+            ->method('getById')
+            ->willThrowException(new Exception('Erro ao buscar pedido'));
+
+        ob_start();
+        $this->pedidoController->getById($id);
+        $output = ob_get_clean();
+
+        $response = json_decode($output, true);
+        $this->assertEquals('Erro ao buscar pedido', $response['error']);
+        $this->assertEquals(500, http_response_code());
+    }
+
+    public function testDeleteSuccess()
+    {
+        $id = 1;
+
+        $this->pedidoModelMock->expects($this->once())
+            ->method('delete')
+            ->with($id)
+            ->willReturn(1);
+
+        ob_start();
+        $this->pedidoController->delete($id);
+        $output = ob_get_clean();
+
+        $response = json_decode($output, true);
+        $this->assertTrue($response['success']);
+        $this->assertEquals('Pedido deletado com sucesso', $response['message']);
+    }
+
+    public function testDeleteNotFound()
+    {
+        $id = 999;
+
+        $this->pedidoModelMock->expects($this->once())
+            ->method('delete')
+            ->with($id)
+            ->willReturn(0);
+
+        ob_start();
+        $this->pedidoController->delete($id);
+        $output = ob_get_clean();
+
+        $response = json_decode($output, true);
+        $this->assertEquals('Pedido não encontrado', $response['error']);
+        $this->assertEquals(404, http_response_code());
+    }
+
+    public function testDeleteWithError()
+    {
+        $id = 1;
+
+        $this->pedidoModelMock->expects($this->once())
+            ->method('delete')
+            ->willThrowException(new Exception('Erro ao deletar pedido'));
+
+        ob_start();
+        $this->pedidoController->delete($id);
+        $output = ob_get_clean();
+
+        $response = json_decode($output, true);
+        $this->assertEquals('Erro ao deletar pedido', $response['error']);
+        $this->assertEquals(500, http_response_code());
     }
 }

@@ -4,103 +4,163 @@ use PHPUnit\Framework\TestCase;
 
 class PedidoTest extends TestCase
 {
+    private $pdoMock;
     private $pedido;
-    private $db;
-    private $stmt;
+    private $stmtMock;
 
     protected function setUp(): void
     {
-        $this->db = $this->createMock(PDO::class);
-        $this->stmt = $this->createMock(PDOStatement::class);
-        $this->pedido = new Pedido($this->db);
+        $this->pdoMock = $this->createMock(PDO::class);
+        
+        $this->stmtMock = $this->createMock(PDOStatement::class);
+        
+        $this->pedido = new Pedido($this->pdoMock);
     }
 
     public function testCreate()
     {
-        $this->db->expects($this->once())
-            ->method('prepare')
-            ->willReturn($this->stmt);
+        $email_cliente = "test@example.com";
+        $quantidade = 2;
+        $preco_total = 100.00;
 
-        $this->stmt->expects($this->once())
+        $this->pdoMock->expects($this->once())
+            ->method('prepare')
+            ->with($this->stringContains("INSERT INTO Pedido"))
+            ->willReturn($this->stmtMock);
+
+        $this->stmtMock->expects($this->exactly(3))
+            ->method('bindParam')
+            ->willReturn(true);
+
+        $this->stmtMock->expects($this->once())
             ->method('execute')
             ->willReturn(true);
 
-        $resultado = $this->pedido->create('test@email.com', 2, 200.00);
-        $this->assertTrue($resultado);
+        $result = $this->pedido->create($email_cliente, $quantidade, $preco_total);
+        $this->assertTrue($result);
     }
 
     public function testList()
     {
-        $esperado = [
-            ['ID' => 1, 'Email_cliente' => 'test@email.com', 'Preco_total' => 200.00],
-            ['ID' => 2, 'Email_cliente' => 'test2@email.com', 'Preco_total' => 150.00]
+        $expectedData = [
+            ['ID' => 1, 'Email_cliente' => 'test@example.com', 'Quantidade' => 2, 'Preco_total' => 100.00],
+            ['ID' => 2, 'Email_cliente' => 'test2@example.com', 'Quantidade' => 1, 'Preco_total' => 50.00]
         ];
 
-        $this->db->expects($this->once())
+        $this->pdoMock->expects($this->once())
             ->method('prepare')
-            ->willReturn($this->stmt);
+            ->with($this->stringContains("SELECT * FROM Pedido"))
+            ->willReturn($this->stmtMock);
 
-        $this->stmt->expects($this->once())
-            ->method('execute');
+        $this->stmtMock->expects($this->once())
+            ->method('execute')
+            ->willReturn(true);
 
-        $this->stmt->expects($this->once())
+        $this->stmtMock->expects($this->once())
             ->method('fetchAll')
-            ->willReturn($esperado);
+            ->with(PDO::FETCH_ASSOC)
+            ->willReturn($expectedData);
 
-        $resultado = $this->pedido->list();
-        $this->assertEquals($esperado, $resultado);
+        $result = $this->pedido->list();
+        $this->assertEquals($expectedData, $result);
     }
 
     public function testGetById()
     {
-        $esperado = ['ID' => 1, 'Email_cliente' => 'test@email.com', 'Preco_total' => 200.00];
+        $id = 1;
+        $expectedData = [
+            'ID' => 1,
+            'Email_cliente' => 'test@example.com',
+            'Quantidade' => 2,
+            'Preco_total' => 100.00
+        ];
 
-        $this->db->expects($this->once())
+        $this->pdoMock->expects($this->once())
             ->method('prepare')
-            ->willReturn($this->stmt);
+            ->with($this->stringContains("SELECT * FROM Pedido WHERE ID = :id"))
+            ->willReturn($this->stmtMock);
 
-        $this->stmt->expects($this->once())
-            ->method('execute');
+        $this->stmtMock->expects($this->once())
+            ->method('bindParam')
+            ->with(':id', $id)
+            ->willReturn(true);
 
-        $this->stmt->expects($this->once())
+        $this->stmtMock->expects($this->once())
+            ->method('execute')
+            ->willReturn(true);
+
+        $this->stmtMock->expects($this->once())
             ->method('fetch')
-            ->willReturn($esperado);
+            ->with(PDO::FETCH_ASSOC)
+            ->willReturn($expectedData);
 
-        $resultado = $this->pedido->getById(1);
-        $this->assertEquals($esperado, $resultado);
-    }
-
-    public function testUpdate()
-    {
-        $this->db->expects($this->once())
-            ->method('prepare')
-            ->willReturn($this->stmt);
-
-        $this->stmt->expects($this->once())
-            ->method('execute');
-
-        $this->stmt->expects($this->once())
-            ->method('rowCount')
-            ->willReturn(1);
-
-        $resultado = $this->pedido->update(1, 3, 300.00);
-        $this->assertEquals(1, $resultado);
+        $result = $this->pedido->getById($id);
+        $this->assertEquals($expectedData, $result);
     }
 
     public function testDelete()
     {
-        $this->db->expects($this->once())
+        $id = 1;
+
+        $this->pdoMock->expects($this->once())
             ->method('prepare')
-            ->willReturn($this->stmt);
+            ->with($this->stringContains("DELETE FROM Pedido WHERE ID = :id"))
+            ->willReturn($this->stmtMock);
 
-        $this->stmt->expects($this->once())
-            ->method('execute');
+        $this->stmtMock->expects($this->once())
+            ->method('bindParam')
+            ->with(':id', $id)
+            ->willReturn(true);
 
-        $this->stmt->expects($this->once())
+        $this->stmtMock->expects($this->once())
+            ->method('execute')
+            ->willReturn(true);
+
+        $this->stmtMock->expects($this->once())
             ->method('rowCount')
             ->willReturn(1);
 
-        $resultado = $this->pedido->delete(1);
-        $this->assertEquals(1, $resultado);
+        $result = $this->pedido->delete($id);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testDeleteNotFound()
+    {
+        $id = 999;
+
+        $this->pdoMock->expects($this->once())
+            ->method('prepare')
+            ->with($this->stringContains("DELETE FROM Pedido WHERE ID = :id"))
+            ->willReturn($this->stmtMock);
+
+        $this->stmtMock->expects($this->once())
+            ->method('bindParam')
+            ->with(':id', $id)
+            ->willReturn(true);
+
+        $this->stmtMock->expects($this->once())
+            ->method('execute')
+            ->willReturn(true);
+
+        $this->stmtMock->expects($this->once())
+            ->method('rowCount')
+            ->willReturn(0);
+
+
+        $result = $this->pedido->delete($id);
+        $this->assertEquals(0, $result);
+    }
+
+    public function testCreateThrowsException()
+    {
+        $email_cliente = "test@example.com";
+        $quantidade = 2;
+        $preco_total = 100.00;
+
+        $this->pdoMock->expects($this->once())
+            ->method('prepare')
+            ->willThrowException(new PDOException('Database error'));
+        $this->expectException(PDOException::class);
+        $this->pedido->create($email_cliente, $quantidade, $preco_total);
     }
 }
