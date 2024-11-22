@@ -1,28 +1,28 @@
 <?php return array(
     'root' => array(
-        'name' => 'michel/projeto-web-de-michel-tebar-802-371',
+        'name' => 'michel/projeto-site-de-processadores-e-placas-de-video',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '7f3bafaf89189ee544fcf24314c7dbdc636398f5',
+        'reference' => '2cbcef434537c63bfac0bd1951132abf83301793',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
         'dev' => true,
     ),
     'versions' => array(
-        'michel/projeto-web-de-michel-tebar-802-371' => array(
+        'michel/projeto-site-de-processadores-e-placas-de-video' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '7f3bafaf89189ee544fcf24314c7dbdc636398f5',
+            'reference' => '2cbcef434537c63bfac0bd1951132abf83301793',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
         'myclabs/deep-copy' => array(
-            'pretty_version' => '1.12.0',
-            'version' => '1.12.0.0',
-            'reference' => '3a6b9a42cd8f8771bd4295d13e1423fa7f3d942c',
+            'pretty_version' => '1.12.1',
+            'version' => '1.12.1.0',
+            'reference' => '123267b2c49fbf30d78a7b2d333f6be754b94845',
             'type' => 'library',
             'install_path' => __DIR__ . '/../myclabs/deep-copy',
             'aliases' => array(),

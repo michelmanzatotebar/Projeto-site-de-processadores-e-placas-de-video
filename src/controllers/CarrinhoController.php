@@ -57,15 +57,23 @@ class CarrinhoController {
         }
     }
     
-    public function remover() {
+    public function remover() 
+    {
         try {
-            $id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT);
-            if ($this->carrinhoModel->delete($id)) {
+            $id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT) ?? 
+                  filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+
+            if ($id && $this->carrinhoModel->delete($id)) {
                 header('Location: /carrinho');
                 exit;
+            } else {
+                throw new Exception("Não foi possível remover o item do carrinho");
             }
         } catch(PDOException $e) {
             $erro = "Erro ao remover item do carrinho: " . $e->getMessage();
+            require_once 'Views/erro.php';
+        } catch(Exception $e) {
+            $erro = $e->getMessage();
             require_once 'Views/erro.php';
         }
     }

@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitfe00fa1b55f4935bd65a125d1e452553
+class ComposerStaticInitae959b169055a97bcc0c653ad18db7f9
 {
     public static $files = array (
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
@@ -12,13 +12,17 @@ class ComposerStaticInitfe00fa1b55f4935bd65a125d1e452553
     );
 
     public static $prefixLengthsPsr4 = array (
+        'T' => 
+        array (
+            'Tests\\' => 6,
+        ),
         'P' => 
         array (
             'PhpParser\\' => 10,
         ),
         'M' => 
         array (
-            'Michel\\ProjetoWebDeMichelTebar802371\\' => 37,
+            'Michel\\ProjetoSiteDeProcessadoresEPlacasDeVideo\\' => 48,
         ),
         'D' => 
         array (
@@ -27,11 +31,15 @@ class ComposerStaticInitfe00fa1b55f4935bd65a125d1e452553
     );
 
     public static $prefixDirsPsr4 = array (
+        'Tests\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/tests',
+        ),
         'PhpParser\\' => 
         array (
             0 => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser',
         ),
-        'Michel\\ProjetoWebDeMichelTebar802371\\' => 
+        'Michel\\ProjetoSiteDeProcessadoresEPlacasDeVideo\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',
         ),
@@ -1239,9 +1247,9 @@ class ComposerStaticInitfe00fa1b55f4935bd65a125d1e452553
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitfe00fa1b55f4935bd65a125d1e452553::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitfe00fa1b55f4935bd65a125d1e452553::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitfe00fa1b55f4935bd65a125d1e452553::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitae959b169055a97bcc0c653ad18db7f9::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitae959b169055a97bcc0c653ad18db7f9::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitae959b169055a97bcc0c653ad18db7f9::$classMap;
 
         }, null, ClassLoader::class);
     }

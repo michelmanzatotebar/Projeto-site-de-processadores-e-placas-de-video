@@ -31,24 +31,6 @@ class Carrinho {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
-    public function update($id, $quantidade) {
-        $item = $this->getById($id);
-        if (!$item) {
-            return false;
-        }
-        
-        $preco_total = $quantidade * $item['Preco_produto'];
-        $sql = "UPDATE Carrinho 
-                SET Quantidade = :quantidade, 
-                    Preco_total = :preco_total 
-                WHERE ID = :id";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindParam(':id', $id);
-        $stmt->bindParam(':quantidade', $quantidade);
-        $stmt->bindParam(':preco_total', $preco_total);
-        $stmt->execute();
-        return $stmt->rowCount();
-    }
     
     public function delete($id) {
         $sql = "DELETE FROM Carrinho WHERE ID = :id";
